@@ -25,6 +25,20 @@ class Validate(Task):
       return
     violations = []
     for target in self.context.targets():
+
+      # make sure we recognize all tags (protect against typos/cruft)
+      for tag in target.tags:
+        if tag.startswith('dependees_must_have:'):
+          continue
+        if tag.startswith('dependencies_cannot_have:'):
+          continue
+        if tag.startswith('dependencies_must_have:'):
+          continue
+        if tag.startswith('exempt'):
+          continue
+        raise ValueError('unknown tag: '+tag)
+
+
       if 'exempt' not in target.tags:
         violations.extend(self.dependee_violations(target))
         violations.extend(self.banned_tag_violations(target))
